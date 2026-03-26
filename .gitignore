@@ -13,3 +13,9 @@ Thumbs.db
 
 # Archives
 *.tar.bz2
+
+# Local simulator checkout and transient build products
+ns-3.47/
+report/build/
+tmp/
+__pycache__/

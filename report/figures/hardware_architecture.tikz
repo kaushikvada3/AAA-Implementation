@@ -1,0 +1,24 @@
+\begin{tikzpicture}[
+    node distance=0.9cm and 0.9cm,
+    block/.style={draw, rounded corners=2pt, align=center, minimum width=2.7cm, minimum height=1.0cm, fill=blue!7},
+    bus/.style={draw, -latex, thick}
+]
+\node[block, fill=cyan!12] (ingress) {1. Packet Ingress\\\& Authenticator};
+\node[block, right=of ingress, fill=cyan!8] (buffer) {2. Payload\\Staging Buffer};
+\node[block, right=of buffer, fill=cyan!12] (prng) {3. Public\\Selector PRNG};
+\node[block, below=of buffer, fill=orange!10] (select) {4. Bit Select\\\& Fold Network};
+\node[block, right=of select, fill=orange!14] (xorreg) {5. XOR Key\\Accumulator};
+\node[block, left=of select, fill=green!10] (stats) {6. Secrecy Monitor\\\& Counters};
+\node[block, below=of xorreg, fill=green!14] (export) {7. Key Export\\\& Crypto Interface};
+
+\draw[bus] (ingress) -- (buffer);
+\draw[bus] (buffer) -- (prng);
+\draw[bus] (buffer) -- (select);
+\draw[bus] (prng) -- (select);
+\draw[bus] (select) -- (xorreg);
+\draw[bus] (xorreg) -- (export);
+\draw[bus] (ingress.south) |- (stats.north);
+\draw[bus] (select.west) -- (stats.east);
+\draw[bus] (stats.east) |- (export.west);
+\draw[bus] (stats.east) |- (xorreg.west);
+\end{tikzpicture}
