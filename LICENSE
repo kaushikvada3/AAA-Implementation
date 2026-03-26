@@ -19,3 +19,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+------------------------------------------------------------------------
+ACADEMIC ATTRIBUTION
+
+This software is an implementation of the secret-key generation method 
+proposed in the following academic research:
+
+Y. Hua, "A Remark on the AAA Method for Secret-Key Generation in 
+Mobile Networks," IEEE Wireless Communications Letters, Dec. 2025.
+
+The theoretical AAA method and its underlying cryptographic concepts 
+remain the intellectual property of the original author as published 
+in IEEE WCL. Any use of this software in academic or research 
+publications must cite the original paper.
