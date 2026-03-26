@@ -8,6 +8,8 @@ This repository contains a lightweight C engine for embedded systems and a visua
 
 [**Launch the Interactive Dashboard**](https://kaushikvada3.github.io/AAA-Implementation/)
 
+![AAA Key Engine Dashboard Preview](dashboard_preview.png)
+
 The web dashboard is a complete JavaScript port of the C engine, allowing you to visualize:
 - Packet flow between Alice and Bob
 - Real-time XOR key accumulation
