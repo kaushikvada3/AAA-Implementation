@@ -60,6 +60,16 @@ The core principle is elegantly simple but cryptographically secure. For a desir
    $$K_{l,n} = X_{l,1} \oplus X_{l,2} \oplus \dots \oplus X_{l,n}$$
 4. Security relies on Eve missing at least one packet. Once she misses a packet that Alice and Bob both received, she permanently loses the deterministic chain required to resolve the XOR accumulation, and her equivocation (uncertainty) per bit approaches 1.0.
 
+## 📚 Academic Attribution & Citation
+
+This software implementation is based on the theoretical framework proposed in the following paper:
+
+> **Y. Hua, "A Remark on the AAA Method for Secret-Key Generation in Mobile Networks,"**  
+> *IEEE Wireless Communications Letters*, Dec. 2025.
+
+If you use this code in academic research or related publications, please cite the original paper above.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Note:** The license pertains to this software implementation. The theoretical AAA method remains the intellectual property of its original authors as published in IEEE WCL.
