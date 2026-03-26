@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AAA Key Engine Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  body { font-family: 'Inter', sans-serif; background-color: #1a1b1e; color: #e5e7eb; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+  .panel { background-color: #25262b; border: 1px solid #373a40; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+  .panel-header { font-size: 0.75rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+  input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #9ca3af; cursor: pointer; margin-top: -6px; box-shadow: 0 0 0 2px #25262b; }
+  input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #4b5563; border-radius: 2px; }
+  input[type=range]:focus { outline: none; }
+  input[type=range]:focus::-webkit-slider-thumb { background: #d1d5db; }
+  .glow-text-green { color: #68D391; text-shadow: 0 0 10px rgba(104,211,145,0.3); }
+  .glow-box-green { box-shadow: 0 0 15px rgba(104,211,145,0.1); border-color: rgba(104,211,145,0.3); }
+  @keyframes fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .log-animate { animation: fade-in 0.3s ease; }
+</style>
+</head>
+<body class="min-h-screen p-6 flex flex-col gap-6">
+
+<header class="flex justify-between items-start">
+  <div>
+    <h1 class="text-3xl font-bold tracking-tight text-white mb-1">AAA Key Engine Dashboard</h1>
+    <p class="text-sm text-gray-400">Accumulative • Adaptable • Additive — Secret-Key Generation</p>
+  </div>
+  <div class="flex gap-3">
+    <button id="badge-keysize" class="px-4 py-2 bg-[#2c2d33] border border-[#373a40] rounded-md text-sm font-medium flex items-center gap-2 hover:bg-[#373a40] transition-colors">
+      128-bit AES
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 9l4-4 4 4m0 6l-4 4-4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+    </button>
+    <div class="px-4 py-2 bg-[#2c2d33] border border-[#373a40] rounded-md text-sm text-gray-300">Y. Hua — IEEE WCL 2025</div>
+  </div>
+</header>
+
+<main class="grid grid-cols-12 gap-6 flex-1">
+  <!-- Left Sidebar -->
+  <section class="col-span-3 panel p-5 flex flex-col h-full">
+    <h2 class="panel-header">PARAMETERS</h2>
+    <div class="flex-1 flex flex-col gap-6">
+      <div>
+        <label class="block text-sm text-gray-300 mb-2">Public Seed (hex)</label>
+        <input id="input-seed" class="w-full bg-[#373a40]/30 border border-[#4b5563]/50 rounded-md text-gray-300 font-mono px-3 py-2 focus:outline-none focus:border-gray-500 uppercase" type="text" value="ABCD1234" maxlength="8" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-2">
+          <label class="text-gray-300">Eve Miss Probability (μ)</label>
+          <span id="val-mu" class="font-mono text-gray-400">0.30</span>
+        </div>
+        <input id="slider-mu" type="range" min="0" max="100" value="30"/>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-2">
+          <label class="text-gray-300">Correlation Factor (α)</label>
+          <span id="val-alpha" class="font-mono text-gray-400">0.30</span>
+        </div>
+        <input id="slider-alpha" type="range" min="0" max="99" value="30"/>
+      </div>
+      <div class="flex items-center justify-between">
+        <label class="text-sm text-gray-300">Key Size</label>
+        <div id="keysize-toggle" class="relative flex items-center bg-[#1a1b1e] border border-[#373a40] rounded-full p-1 w-40 cursor-pointer select-none">
+          <div id="toggle-128" class="flex-1 text-center text-xs z-10 py-1 text-white">128-bit</div>
+          <div id="toggle-256" class="flex-1 text-center text-xs z-10 py-1 text-gray-400">256-bit</div>
+          <div id="toggle-pill" class="absolute left-1 top-1 bottom-1 w-[calc(50%-0.25rem)] bg-[#373a40] rounded-full transition-all duration-200"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-2">
+          <label class="text-gray-300">Payload Size</label>
+          <span id="val-payload" class="font-mono text-gray-400">256 B</span>
+        </div>
+        <input id="slider-payload" type="range" min="64" max="1024" value="256" step="64"/>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-2">
+          <label class="text-gray-300">Auto Speed</label>
+          <span id="val-speed" class="font-mono text-gray-400">200 ms</span>
+        </div>
+        <input id="slider-speed" type="range" min="10" max="1000" value="200" step="10"/>
+      </div>
+    </div>
+    <div class="mt-8 flex flex-col gap-3">
+      <button id="btn-step" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium bg-gradient-to-b from-[#6b7280] to-[#4b5563] text-white border border-[#4b5563] hover:from-[#9ca3af] hover:to-[#6b7280] shadow-lg shadow-white/5 transition-all w-full">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Step
+      </button>
+      <button id="btn-auto" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium bg-[#2c2d33] text-gray-300 border border-[#373a40] hover:bg-[#373a40] transition-all w-full">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg> Auto
+      </button>
+      <button id="btn-reset" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium bg-[#2c2d33] text-gray-300 border border-[#373a40] hover:bg-[#373a40] transition-all w-full">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg> Reset
+      </button>
+    </div>
+  </section>
+
+  <!-- Middle Column -->
+  <section class="col-span-6 flex flex-col gap-6">
+    <!-- Packet Flow -->
+    <div class="panel p-5 relative overflow-hidden h-48">
+      <h2 class="panel-header absolute top-5 left-5 z-10">PACKET FLOW</h2>
+      <svg id="flow-svg" class="w-full h-full absolute inset-0" preserveAspectRatio="xMidYMid meet" viewBox="0 0 800 200">
+        <circle cx="200" cy="100" fill="#3b82f6" filter="blur(20px)" opacity="0.05" r="80"/>
+        <circle cx="600" cy="100" fill="#3b82f6" filter="blur(20px)" opacity="0.05" r="80"/>
+        <g transform="translate(150, 80)">
+          <circle cx="0" cy="0" fill="#1f2937" r="24" stroke="#4b5563" stroke-width="2"/>
+          <path d="M-8 -4 A8 8 0 1 1 8 -4 A8 8 0 1 1 -8 -4 M-12 12 Q0 -4 12 12" fill="none" stroke="#9ca3af" stroke-linecap="round" stroke-width="2"/>
+          <text fill="#9ca3af" font-family="Inter" font-size="12" text-anchor="middle" x="0" y="35">Alice</text>
+        </g>
+        <g transform="translate(650, 80)">
+          <circle cx="0" cy="0" fill="#1f2937" r="24" stroke="#4b5563" stroke-width="2"/>
+          <path d="M-8 -4 A8 8 0 1 1 8 -4 A8 8 0 1 1 -8 -4 M-12 12 Q0 -4 12 12" fill="none" stroke="#9ca3af" stroke-linecap="round" stroke-width="2"/>
+          <text fill="#9ca3af" font-family="Inter" font-size="12" text-anchor="middle" x="0" y="35">Bob</text>
+        </g>
+        <line stroke="#4b5563" stroke-dasharray="5,5" stroke-width="2" x1="180" x2="620" y1="80" y2="80"/>
+        <line id="flow-progress" stroke="#60a5fa" stroke-width="2" x1="180" x2="180" y1="80" y2="80"/>
+        <polygon fill="#4b5563" points="620,80 610,75 610,85"/>
+        <g id="packet-group" transform="translate(400, 70)">
+          <rect fill="#d1d5db" height="24" rx="2" width="20" x="-10" y="-12"/>
+          <path d="M-5 -6 L5 -6 M-5 0 L5 0 M-5 6 L2 6" stroke="#4b5563" stroke-linecap="round" stroke-width="2"/>
+          <text id="packet-num-text" fill="#e5e7eb" font-family="Inter" font-size="12" text-anchor="middle" x="0" y="-20">Waiting…</text>
+        </g>
+        <g transform="translate(400, 140)">
+          <circle cx="0" cy="0" fill="#1f2937" r="20" stroke="#ef4444" stroke-dasharray="2,2" stroke-width="1"/>
+          <path d="M-6 -3 A6 6 0 1 1 6 -3 A6 6 0 1 1 -6 -3 M-10 10 Q0 -2 10 10" fill="none" stroke="#9ca3af" stroke-linecap="round" stroke-width="1.5"/>
+          <text fill="#9ca3af" font-family="Inter" font-size="12" text-anchor="middle" x="0" y="25">Eve</text>
+          <line stroke="#4b5563" stroke-dasharray="3,3" stroke-width="1" x1="0" x2="0" y1="-50" y2="-25"/>
+          <g transform="translate(25, -15)">
+            <rect id="eve-pill-bg" fill="#374151" height="24" opacity="0.9" rx="12" width="130" x="0" y="0"/>
+            <text id="eve-status-text" fill="#e5e7eb" font-family="Inter" font-size="11" x="10" y="16">Listening…</text>
+            <circle id="eve-status-dot" cx="115" cy="12" fill="#6b7280" r="6"/>
+            <path id="eve-status-icon" d="" fill="none" stroke="white" stroke-linecap="round" stroke-width="1.5"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Live Key State -->
+    <div id="key-panel" class="panel p-5 relative">
+      <h2 class="panel-header">LIVE KEY STATE</h2>
+      <div class="grid grid-cols-3 gap-4 mb-3">
+        <div class="bg-[#1a1b1e] border border-green-900/50 rounded p-3">
+          <div class="text-xs text-gray-400 mb-1">Alice</div>
+          <div id="key-alice" class="font-mono text-[10px] sm:text-[11px] text-green-400 whitespace-nowrap tracking-tight leading-relaxed">—</div>
+        </div>
+        <div class="bg-[#1a1b1e] border border-green-900/50 rounded p-3">
+          <div class="text-xs text-gray-400 mb-1">Bob</div>
+          <div id="key-bob" class="font-mono text-[10px] sm:text-[11px] text-green-400 whitespace-nowrap tracking-tight leading-relaxed">—</div>
+        </div>
+        <div class="bg-[#1a1b1e] border border-red-900/30 rounded p-3 opacity-70">
+          <div class="text-xs text-gray-400 mb-1">Eve</div>
+          <div id="key-eve" class="font-mono text-[10px] sm:text-[11px] text-gray-500 whitespace-nowrap tracking-tight leading-relaxed">—</div>
+        </div>
+      </div>
+      <div id="match-indicator" class="flex justify-center items-center gap-2 text-sm font-medium text-gray-500">—</div>
+    </div>
+
+    <!-- XOR Table -->
+    <div class="panel p-5">
+      <h2 class="panel-header">XOR ACCUMULATION</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <tbody class="font-mono text-gray-300">
+            <tr class="border-b border-[#373a40]">
+              <td class="py-2 text-gray-400 font-sans text-xs uppercase tracking-wider">Selected bits:</td>
+              <td id="xor-s0" class="py-2 text-right">—</td>
+              <td id="xor-s1" class="py-2 text-right">—</td>
+              <td id="xor-s2" class="py-2 text-right">—</td>
+              <td id="xor-s3" class="py-2 text-right">—</td>
+            </tr>
+            <tr class="border-b border-[#373a40]">
+              <td class="py-2 text-gray-400 font-sans text-xs uppercase tracking-wider">Previous key:</td>
+              <td id="xor-p0" class="py-2 text-right">—</td>
+              <td id="xor-p1" class="py-2 text-right">—</td>
+              <td id="xor-p2" class="py-2 text-right">—</td>
+              <td id="xor-p3" class="py-2 text-right">—</td>
+            </tr>
+            <tr>
+              <td class="py-2 text-gray-400 font-sans text-xs uppercase tracking-wider">New key:</td>
+              <td id="xor-n0" class="py-2 text-right text-white font-medium">—</td>
+              <td id="xor-n1" class="py-2 text-right text-white font-medium">—</td>
+              <td id="xor-n2" class="py-2 text-right text-white font-medium">—</td>
+              <td id="xor-n3" class="py-2 text-right text-white font-medium">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="panel p-5 flex flex-col" style="height:220px">
+      <h2 class="panel-header">EQUIVOCATION ε<sub>n</sub> VS PACKETS</h2>
+      <div class="flex-1 relative w-full">
+        <canvas id="chart-canvas" class="absolute inset-0 w-full h-full"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right Sidebar -->
+  <section class="col-span-3 flex flex-col gap-6 h-full">
+    <div class="panel p-5">
+      <h2 class="panel-header">STATISTICS</h2>
+      <ul class="space-y-4 text-sm">
+        <li class="flex justify-between border-b border-[#373a40] pb-2"><span class="text-gray-400">Packets Processed</span><span id="stat-packets" class="font-mono text-white">0</span></li>
+        <li class="flex justify-between border-b border-[#373a40] pb-2"><span class="text-gray-400">Eve Missed</span><span id="stat-missed" class="font-mono text-white">0</span></li>
+        <li class="flex justify-between border-b border-[#373a40] pb-2"><span class="text-gray-400">Eve Miss Rate</span><span id="stat-missrate" class="font-mono text-white">0.0%</span></li>
+        <li class="flex justify-between border-b border-[#373a40] pb-2"><span class="text-gray-400">Equivocation ε<sub>n</sub></span><span id="stat-equiv" class="font-mono text-white">0.0000</span></li>
+        <li class="flex justify-between border-b border-[#373a40] pb-2 items-center"><span class="text-gray-400">Perfect Secrecy</span><span id="stat-secrecy" class="text-gray-500 text-xs font-medium">Not Yet</span></li>
+        <li class="flex justify-between items-center"><span class="text-gray-400">Keys Match</span><span id="stat-match" class="text-gray-500 text-xs font-medium">—</span></li>
+      </ul>
+    </div>
+    <div class="panel p-5 flex-1 flex flex-col min-h-[300px]">
+      <h2 class="panel-header">PACKET LOG</h2>
+      <div id="packet-log" class="flex-1 overflow-y-auto pr-2 space-y-3 font-mono text-xs text-gray-300"></div>
+    </div>
+  </section>
+</main>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body></html>
