@@ -10,16 +10,16 @@
 
 | Item | Model | Where | Cost | Priority |
 |---|---|---|---|---|
-| FPGA Development Board | Digilent Arty A7-35T (xc7a35ticsg324-1L) | Digilent.com | ~$149 | **Buy now** |
+| FPGA Development Board | **Digilent Arty A7-100T (xc7a100tcsg324-1)** — locked in as target | Digilent.com | ~$249 | Owned |
 | Radio modules (optional, for live demo) | HiLetgo 4pcs nRF24L01+ | Amazon | ~$8 | After Weeks 8–9 |
 
 **Do not buy:** Jetson Nano, Jetson Orin, or any GPU board. The AAA engine has no GPU-parallelizable workload.
 
-**Why Arty A7-35T:**
-- Xilinx Artix-7 FPGA — fully supported by Vivado free tier (no license needed)
-- 20,800 LUTs, 41,600 FFs, 50 BRAMs — your design will use ~1–2% of this
-- Built-in USB-UART bridge (no external programmer needed)
-- Most common academic FPGA board with extensive documentation
+**Why Arty A7-100T (the variant we're using):**
+- Xilinx Artix-7 FPGA — fully supported by Vivado ML Standard free tier (no license needed)
+- 63,400 LUTs, 126,800 FFs, 135 BRAM tiles, 240 DSP48 slices — design will use <1%
+- Built-in USB-UART bridge (FT2232HQ) — no external programmer needed
+- Same package as the A7-35T, only the die changes; XDC is board-specific (`constraints/arty_a7_100t.xdc`)
 
 ---
 
@@ -107,25 +107,29 @@ Build and verify blocks in this order — smallest/simplest first, integration l
 **Key constraint:** Must be bit-exact with the C `xorshift32()` function in `aaa_key_engine.c`.
 
 ```systemverilog
-module xorshift32 (
+// NOTE: three sequential non-blocking assigns to the same register
+// only keep the LAST assignment — they all evaluate the OLD `state`.
+// The xorshift chain MUST be computed combinationally (or with blocking
+// assigns inside a single statement). The corrected form is:
+
+module xorshift32 #(parameter logic [31:0] SEED_DEFAULT = 32'hABCD_1234) (
     input  logic        clk,
     input  logic        rst_n,
     input  logic        advance,
     input  logic [31:0] seed,
     output logic [31:0] rnd_out
 );
-    logic [31:0] state;
-    always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            state   <= seed;
-            rnd_out <= seed;
-        end else if (advance) begin
-            state <= state ^ (state << 13);
-            state <= state ^ (state >> 17);
-            state <= state ^ (state << 5);
-            rnd_out <= state;
-        end
+    logic [31:0] state, x0, x1, x2;
+    always_comb begin
+        x0 = state ^ (state << 13);
+        x1 = x0    ^ (x0    >> 17);
+        x2 = x1    ^ (x1    <<  5);
     end
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)         state <= (seed != 0) ? seed : SEED_DEFAULT;
+        else if (advance)   state <= x2;
+    end
+    assign rnd_out = state;
 endmodule
 ```
 
@@ -274,7 +278,7 @@ After RTL is verified, run synthesis to generate the results your report needs.
 In Vivado, with `aaa_engine_top.sv` as top (excluding UART wrappers):
 
 ```tcl
-synth_design -top aaa_engine -part xc7a35ticsg324-1L
+synth_design -top aaa_engine -part xc7a100tcsg324-1
 opt_design
 place_design
 route_design

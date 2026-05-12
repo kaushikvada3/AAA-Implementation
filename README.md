@@ -220,6 +220,56 @@ Supporting files:
 - `report/generated/metrics.tex`
 - `tmp/pdfs/aaa_secret_key_report-*.png`
 
+## FPGA Implementation (Arty A7-100T)
+
+A complete SystemVerilog implementation of the AAA engine ships under `rtl/`,
+with testbenches in `tb/`, board constraints in `constraints/`, and a Vivado
+non-project flow in `vivado/`. The design is bit-exact against the C engine in
+`aaa_key_engine.c` and is verified hardware-in-the-loop over the FT2232 USB-UART.
+
+Build order (see `HARDWARE_PLAN.md` for the full architecture):
+
+1. **Generate test vectors from the C reference**
+
+   ```bash
+   make -C tools run
+   # → tb/vectors/{payload,prng,selected,key}_<round>.hex + bob_rounds.txt
+   ```
+
+2. **Run the unit + integration testbenches** (Vivado xsim)
+
+   ```bat
+   :: from a Vivado-aware shell
+   vivado\run_all_sims.bat
+   ```
+
+   The integration TB (`tb/tb_aaa_engine_top.sv`) replays every Bob-received
+   round from `sim/output/reference_run.csv` and asserts the running key
+   matches the C-engine snapshot byte-for-byte.
+
+3. **Synthesize for the Arty A7-100T**
+
+   ```bat
+   vivado\build_all.bat
+   ```
+
+   Produces `build/aaa_engine_128bit.bit`, `build/aaa_engine_256bit.bit`, and
+   utilization / timing / power reports under `build/` for both key widths.
+
+4. **Hardware-in-the-loop validation**
+
+   ```bash
+   pip install pyserial
+   python scripts/hil_send_packets.py --port COM5
+   ```
+
+   Streams the reference packets to the Arty over UART (115200 8N1) and
+   compares the FPGA's per-round key against the C-engine's. Bit-exact
+   match on all Bob-received rounds = engine hardware-verified.
+
+The bitstream's top is `aaa_engine_uart_wrap`; the synthesis boundary for
+the paper's area/timing numbers is the inner `aaa_engine` module (no UART).
+
 ## Browser Demo
 
 The browser demo is still available and remains useful for explaining the AAA mechanism visually:

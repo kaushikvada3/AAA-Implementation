@@ -19,3 +19,32 @@ ns-3.47/
 report/build/
 tmp/
 __pycache__/
+
+# Vivado synthesis / xsim run artifacts
+build/
+.Xil/
+vivado*.log
+vivado*.jou
+clockInfo.txt
+*.wdb
+*.pb
+*.str
+xsim.dir/
+tb/xsim*.log
+tb/xsim*.jou
+tb/xvlog.log
+tb/xvlog.pb
+tb/xelab.log
+tb/xelab.pb
+tb/*.backup.log
+tb/*.backup.jou
+
+# Worktree management and Claude metadata
+.claude/
+
+# RTL test vectors (regenerate with `make -C tools run`)
+tb/vectors/
+
+# Compiled vector generator
+tools/gen_rtl_vectors
+tools/gen_rtl_vectors.exe
